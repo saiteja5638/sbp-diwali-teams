@@ -200,21 +200,19 @@ const TEAMS = [
   {key:"D", name:"Team D", em:"✨", c:"#c084ff"},
 ];
 
-/* ---------- ASSIGNMENT ---------- */
-const STORE = "diwali_team_draw_v1";
-function shuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
-function draw(){
-  const map = {};
-  EMP.slice(0,SUPERIOR_COUNT).forEach((e,i)=>map[e.id]=i%4);
-  shuffle(EMP.slice(SUPERIOR_COUNT)).forEach((e,i)=>map[e.id]=i%4); // random order, dealt evenly
-  try{localStorage.setItem(STORE,JSON.stringify(map))}catch(e){}
-  return map;
-}
-function load(){
-  try{const m=JSON.parse(localStorage.getItem(STORE));if(m&&EMP.every(e=>e.id in m))return m}catch(e){}
-  return draw();
-}
-let MAP = load(), ACTIVE = null;
+/* ---------- ASSIGNMENT (fixed - identical for every viewer, mobile and web) ---------- */
+// 0=Team A, 1=Team B, 2=Team C, 3=Team D. First 8 are superiors (A,B,C,D,A,B,C,D); the rest were shuffled once and fixed here.
+const FIXED = {
+  "BPSH001":0,"BPSH003":1,"BPSH010":2,"BPSH012":3,"BPSH017":0,"BPSH020":1,"BPSH023":2,"BPSH034":3,
+  "BPSH036":1,"BPSH038":3,"BPSH052":2,"BPSH053":2,"BPSH055":1,"BPSH056":1,"BPSH057":3,"BPSH059":1,
+  "BPSH063":2,"BPSH065":3,"BPSH069":1,"BPSH073":3,"BPSH074":1,"BPSH078":2,"BPSH092":2,"BPSH095":0,
+  "BPSH096":3,"BPSH101":1,"BPSH106":1,"BPSH107":2,"BPSH110":3,"BPSH111":0,"BPSH112":1,"BPSH113":3,
+  "BPSH114":0,"BPSH115":3,"BPSH116":0,"BPSH117":0,"BPSH118":0,"BPSH119":1,"BPSH120":2,"BPSH121":2,
+  "BPSH122":3,"BPSH126":1,"BPSH128":0,"BPSH133":1,"BPSH134":3,"BPSH135":1,"BPSH137":0,"BPSH139":3,
+  "BPSH141":0,"BPSH143":0,"BPSH144":2,"BPSH146":2,"BPSH147":0,"BPSH148":2,"BPSH149":3,"BPSH150":0,
+  "BPSH151":2,"BPSH152":1,"BPSH153":2,"BPSH154":0,"BPSH155":0,"BPSH158":3,"BPSH159":2,"BPSH160":3
+};
+let MAP = FIXED, ACTIVE = null;
 
 /* ---------- RENDER ---------- */
 const $ = id=>document.getElementById(id);
