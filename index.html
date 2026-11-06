@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Diwali Team Draw</title>
+<style>
+  :root{
+    --gold:#ffd166; --orange:#ff8c1a; --bg1:#12002b; --bg2:#2a0845; --bg3:#4a0e2e;
+    --card:rgba(255,255,255,.07); --line:rgba(255,209,102,.25);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{min-height:100%}
+  body{
+    font-family:"Segoe UI",system-ui,-apple-system,Roboto,sans-serif;color:#fff4dc;
+    background:radial-gradient(ellipse at top,var(--bg2),var(--bg1) 60%) fixed;
+    overflow-x:hidden;
+  }
+  #sky{position:fixed;inset:0;z-index:0;pointer-events:none}
+  #fx{position:fixed;inset:0;z-index:1;pointer-events:none}
+  .stars i{position:fixed;width:3px;height:3px;border-radius:50%;background:#fff;z-index:0;animation:tw 3s infinite ease-in-out}
+  @keyframes tw{0%,100%{opacity:.15;transform:scale(.6)}50%{opacity:1;transform:scale(1.3)}}
+  .wrap{position:relative;z-index:2;max-width:1100px;margin:0 auto;padding:18px 14px 90px}
+
+  header{text-align:center;padding:18px 0 8px}
+  .diyas{font-size:34px;letter-spacing:10px;animation:flick 1.6s infinite alternate}
+  @keyframes flick{from{filter:drop-shadow(0 0 6px #ff9a1f)}to{filter:drop-shadow(0 0 18px #ffd166)}}
+  h1{
+    font-size:clamp(28px,6vw,54px);font-weight:900;letter-spacing:1px;
+    background:linear-gradient(90deg,#ffd166,#ff6b6b,#ffd166,#ff8c1a);background-size:300% 100%;
+    -webkit-background-clip:text;background-clip:text;color:transparent;animation:shine 5s linear infinite;
+  }
+  @keyframes shine{to{background-position:300% 0}}
+  .sub{opacity:.85;margin-top:4px;font-size:clamp(13px,3.4vw,17px)}
+
+  .controls{display:flex;flex-wrap:wrap;gap:10px;margin:18px 0 12px;align-items:center}
+  .search{flex:1 1 240px;position:relative}
+  .search input{
+    width:100%;padding:13px 16px 13px 42px;border-radius:30px;border:1.5px solid var(--line);
+    background:rgba(0,0,0,.35);color:#fff;font-size:16px;outline:none;transition:.25s
+  }
+  .search input:focus{border-color:var(--gold);box-shadow:0 0 18px rgba(255,209,102,.45)}
+  .search span{position:absolute;left:15px;top:50%;transform:translateY(-50%);font-size:18px}
+  button{
+    cursor:pointer;border:0;padding:12px 20px;border-radius:30px;font-weight:700;font-size:15px;color:#2b0a00;
+    background:linear-gradient(135deg,#ffd166,#ff8c1a);box-shadow:0 4px 18px rgba(255,140,26,.45);transition:.2s
+  }
+  button:hover{transform:translateY(-2px) scale(1.03)}
+  button:active{transform:scale(.96)}
+  button.alt{background:linear-gradient(135deg,#ff5e7e,#b86bff);color:#fff;box-shadow:0 4px 18px rgba(184,107,255,.45)}
+
+  .teams{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:14px}
+  .tcard{
+    background:var(--card);border:1.5px solid var(--c);border-radius:18px;padding:14px 10px;text-align:center;
+    cursor:pointer;backdrop-filter:blur(6px);transition:.25s;position:relative;overflow:hidden
+  }
+  .tcard::before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 50% 0,var(--c),transparent 70%);opacity:.18}
+  .tcard:hover,.tcard.on{transform:translateY(-4px);box-shadow:0 0 26px var(--c)}
+  .tcard .em{font-size:30px;display:block;animation:bob 2.4s infinite ease-in-out}
+  @keyframes bob{50%{transform:translateY(-6px) rotate(6deg)}}
+  .tcard b{display:block;font-size:clamp(13px,3.2vw,18px);margin-top:4px;position:relative}
+  .tcard small{opacity:.8;position:relative;display:block;font-size:12px}
+  .tcard .n{font-size:22px;font-weight:900;color:var(--c);position:relative}
+
+  .tablebox{
+    background:var(--card);border:1px solid var(--line);border-radius:18px;overflow:hidden;backdrop-filter:blur(6px)
+  }
+  table{width:100%;border-collapse:collapse}
+  thead th{
+    position:sticky;top:0;background:linear-gradient(90deg,#5b1a00,#7a1f3d);color:var(--gold);
+    text-align:left;padding:13px 12px;font-size:14px;letter-spacing:.5px;text-transform:uppercase
+  }
+  tbody td{padding:11px 12px;border-top:1px solid rgba(255,255,255,.07);font-size:15px}
+  tbody tr{animation:rise .5s both;transition:background .2s}
+  tbody tr:hover{background:rgba(255,209,102,.1)}
+  @keyframes rise{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+  .tag{display:inline-block;padding:4px 12px;border-radius:20px;font-size:13px;font-weight:700;color:#190018;background:var(--c)}
+  .sup{color:var(--gold);font-weight:700}
+  mark{background:#ffd166;color:#2b0a00;border-radius:3px;padding:0 2px}
+  .empty{padding:30px;text-align:center;opacity:.8;display:none}
+  .count{margin:8px 4px;font-size:13px;opacity:.8}
+
+  footer{text-align:center;opacity:.7;font-size:13px;margin-top:18px}
+  .hint{position:fixed;bottom:10px;left:0;right:0;text-align:center;font-size:12px;opacity:.7;z-index:3;pointer-events:none}
+
+  @media(max-width:640px){
+    .teams{grid-template-columns:repeat(2,1fr)}
+    thead{display:none}
+    table,tbody,tr,td{display:block;width:100%}
+    tbody tr{margin:10px;width:auto;border:1px solid var(--line);border-radius:14px;padding:6px 4px;background:rgba(0,0,0,.25)}
+    tbody td{border:0;display:flex;justify-content:space-between;gap:10px;padding:7px 12px}
+    tbody td::before{content:attr(data-l);color:var(--gold);font-weight:700;font-size:12px;text-transform:uppercase}
+    button{flex:1}
+  }
+</style>
+</head>
+<body>
+<div class="stars" id="stars"></div>
+<canvas id="fx"></canvas>
+
+<div class="wrap">
+  <header>
+    <div class="diyas">🪔 🪔 🪔</div>
+    <h1>✨ Happy Diwali Team Draw ✨</h1>
+  </header>
+
+  <div class="controls">
+    <div class="search"><span>🔍</span>
+      <input id="q" type="search" placeholder="Search by name, ID or team…" autocomplete="off">
+    </div>
+  </div>
+
+  <div class="teams" id="teams"></div>
+
+  <div class="count" id="count"></div>
+  <div class="tablebox">
+    <table>
+      <thead><tr><th>#</th><th>Employee ID</th><th>Employee Name</th><th>Team</th></tr></thead>
+      <tbody id="tb"></tbody>
+    </table>
+    <div class="empty" id="empty">🪔 No match found</div>
+  </div>
+  <footer>🪔 Shubh Deepavali 🪔</footer>
+</div>
+<div class="hint">Tap anywhere to fire a cracker 🎆</div>
+
+<script>
+/* ---------- DATA ---------- */
+const SUPERIOR_COUNT = 8; // first N employees (in list order) are superiors, assigned A,B,C,D,A,B,C,D…
+const RAW = `BPSH001|Prudvin Reddy Kaukuntla
+BPSH003|Naga Satish Kumar Sudani
+BPSH010|Nageswara Reddy Alla
+BPSH012|Pavan Kumar P.V.N.D
+BPSH017|Chandrababu Katta
+BPSH020|Anilkumar Reddy Guvvala
+BPSH023|Deepa Adla
+BPSH034|Naresh Dega
+BPSH036|Susheel Aitha
+BPSH038|Sujit Sahoo
+BPSH052|Swetha Undapalli
+BPSH053|Rama Rajashaker Yarakala
+BPSH055|Naresh Kumar Shirupa
+BPSH056|Lalit Kiran Ramanujam
+BPSH057|Hanumantharao Chundu
+BPSH059|Shathish Arasu
+BPSH063|Vikas Mulkala
+BPSH065|Aravind Pasupuleti
+BPSH069|Rajesh Ramagiri
+BPSH073|Sai Kiran Gali
+BPSH074|Babu Vamsi Kattamuri
+BPSH078|Santosh Kumar Kairamkonda
+BPSH092|Bassa Sai Pavan
+BPSH095|Bhuma Amar Nath Reddy
+BPSH096|Daka Pradeep Kumar
+BPSH101|Gattu Rakesh
+BPSH106|Bhavadeep Paladugu
+BPSH107|Jayateja Dungala
+BPSH110|Raveendra Marupu
+BPSH111|Narendrakumar Kondaveeti
+BPSH112|Sharief Ahamed
+BPSH113|Tejaswi Koti
+BPSH114|Sai Sandeep Dittakavi
+BPSH115|V.S.P Mahesh Avireddy
+BPSH116|Anjaneyulu jalla
+BPSH117|Moksha Guddeti
+BPSH118|Hussain Basha Dudekula
+BPSH119|Pavithra Chelukala
+BPSH120|Uma Parsa
+BPSH121|Murali Krishna mahabali
+BPSH122|Supriya Naraboina
+BPSH126|Sai Teja Cherviralla
+BPSH128|Seshu Kumar Pureti
+BPSH133|Siva SaiNath Reddy Gouru
+BPSH134|Naga Divya Ganta
+BPSH135|Afeefa Maniyar
+BPSH137|Neelima Rani Pinninti
+BPSH139|Gangadhar Mallipudi
+BPSH141|Thahaseen Mirza
+BPSH143|Mohan Pentakota
+BPSH144|Shanmukhi Repaka
+BPSH146|Naveen Kukudala
+BPSH147|Meenakshi Naga Ravali Chakka
+BPSH148|Teja Bandi
+BPSH149|Dibyajyoti Das
+BPSH150|Chandana Mangali
+BPSH151|Sohan Velagandula
+BPSH152|Mahesh Nijampattanam
+BPSH153|Vivek Reddy Bonagiri
+BPSH154|Niteesh Kumar Konkena
+BPSH155|Sadik Baba Shaik
+BPSH158|Satyanarayana Inti
+BPSH159|Kavya Sudha Kalavala
+BPSH160|Jagadeeswara Rao B V`;
+const EMP = RAW.split("\n").map(l=>{const [id,n]=l.split("|");return {id:id.trim(),name:n.replace(/\s+/g," ").trim()}});
+
+const TEAMS = [
+  {key:"A", name:"Team A", em:"🚀", c:"#ff5252"},
+  {key:"B", name:"Team B", em:"🎇", c:"#ffb400"},
+  {key:"C", name:"Team C", em:"🌀", c:"#29d3ff"},
+  {key:"D", name:"Team D", em:"✨", c:"#c084ff"},
+];
+
+/* ---------- ASSIGNMENT ---------- */
+const STORE = "diwali_team_draw_v1";
+function shuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+function draw(){
+  const map = {};
+  EMP.slice(0,SUPERIOR_COUNT).forEach((e,i)=>map[e.id]=i%4);
+  shuffle(EMP.slice(SUPERIOR_COUNT)).forEach((e,i)=>map[e.id]=i%4); // random order, dealt evenly
+  try{localStorage.setItem(STORE,JSON.stringify(map))}catch(e){}
+  return map;
+}
+function load(){
+  try{const m=JSON.parse(localStorage.getItem(STORE));if(m&&EMP.every(e=>e.id in m))return m}catch(e){}
+  return draw();
+}
+let MAP = load(), ACTIVE = null;
+
+/* ---------- RENDER ---------- */
+const $ = id=>document.getElementById(id);
+const esc = s=>s.replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+function hl(text,q){
+  if(!q) return esc(text);
+  const i=text.toLowerCase().indexOf(q);
+  if(i<0) return esc(text);
+  return esc(text.slice(0,i))+"<mark>"+esc(text.slice(i,i+q.length))+"</mark>"+esc(text.slice(i+q.length));
+}
+function rows(){
+  const q=$("q").value.trim().toLowerCase();
+  return {q, list: EMP.map((e,i)=>({...e,i,t:MAP[e.id],sup:i<SUPERIOR_COUNT}))
+    .filter(r=>(ACTIVE===null||r.t===ACTIVE) &&
+      (!q || r.id.toLowerCase().includes(q) || r.name.toLowerCase().includes(q) ||
+       TEAMS[r.t].name.toLowerCase().includes(q) || ("team "+TEAMS[r.t].key).toLowerCase().includes(q)))
+    .sort((a,b)=>a.t-b.t||a.i-b.i)};
+}
+function renderTeams(){
+  const cnt=[0,0,0,0];EMP.forEach(e=>cnt[MAP[e.id]]++);
+  $("teams").innerHTML=TEAMS.map((t,i)=>`
+    <div class="tcard ${ACTIVE===i?"on":""}" style="--c:${t.c}" data-t="${i}">
+      <span class="em">${t.em}</span><b>${t.name}</b><span class="n">${cnt[i]}</span>
+    </div>`).join("");
+}
+function renderTable(){
+  const {q,list}=rows();
+  $("tb").innerHTML=list.map((r,k)=>{const t=TEAMS[r.t];return `
+    <tr style="--c:${t.c};animation-delay:${Math.min(k,20)*25}ms">
+      <td data-l="#">${k+1}</td>
+      <td data-l="Employee ID">${hl(r.id,q)}</td>
+      <td data-l="Name">${hl(r.name,q)}</td>
+      <td data-l="Team"><span class="tag">${t.em} ${t.name}</span></td>
+    </tr>`}).join("");
+  $("empty").style.display=list.length?"none":"block";
+  $("count").textContent=`Showing ${list.length} of ${EMP.length} employees`+(ACTIVE!==null?` · Team ${TEAMS[ACTIVE].key}`:"");
+}
+function renderAll(){renderTeams();renderTable()}
+
+$("q").addEventListener("input",renderTable);
+$("teams").addEventListener("click",e=>{
+  const c=e.target.closest(".tcard");if(!c)return;
+  const t=+c.dataset.t;ACTIVE=ACTIVE===t?null:t;renderAll();
+});
+
+/* ---------- STARS ---------- */
+(function(){
+  let h="";for(let i=0;i<60;i++)h+=`<i style="left:${Math.random()*100}%;top:${Math.random()*100}%;animation-delay:${Math.random()*3}s;animation-duration:${2+Math.random()*3}s"></i>`;
+  $("stars").innerHTML=h;
+})();
+
+/* ---------- FIREWORKS ---------- */
+const cv=$("fx"),cx=cv.getContext("2d");
+let W,H,DPR=Math.min(devicePixelRatio||1,2);
+function size(){W=innerWidth;H=innerHeight;cv.width=W*DPR;cv.height=H*DPR;cv.style.width=W+"px";cv.style.height=H+"px";cx.setTransform(DPR,0,0,DPR,0,0)}
+addEventListener("resize",size);size();
+const rockets=[],sparks=[];
+const COLORS=["#ff5252","#ffd166","#29d3ff","#c084ff","#ff8c1a","#7dff6b","#ff6bd6","#ffffff"];
+function launch(x,y){ // rocket rises from bottom to (x,y)
+  rockets.push({x:x+(Math.random()*40-20),y:H,tx:x,ty:y,vy:-(9+Math.random()*3),c:COLORS[Math.random()*COLORS.length|0]});
+}
+function burst(x,y,c){
+  const n=60+Math.random()*40|0,type=Math.random();
+  const c2=COLORS[Math.random()*COLORS.length|0];
+  for(let i=0;i<n;i++){
+    const a=Math.PI*2*i/n, s=type<.35?4.2:(1.5+Math.random()*4.5); // ring or sphere
+    sparks.push({x,y,vx:Math.cos(a)*s,vy:Math.sin(a)*s,l:1,d:.011+Math.random()*.012,c:i%3?c:c2,r:1.5+Math.random()*1.5});
+  }
+}
+function loop(){
+  cx.globalCompositeOperation="destination-out";cx.fillStyle="rgba(0,0,0,.2)";cx.fillRect(0,0,W,H);
+  cx.globalCompositeOperation="lighter";
+  for(let i=rockets.length-1;i>=0;i--){
+    const r=rockets[i];r.y+=r.vy;r.vy*=.985;
+    sparks.push({x:r.x,y:r.y,vx:Math.random()-.5,vy:Math.random()*1.5,l:.6,d:.05,c:"#ffcf70",r:1.2});
+    cx.fillStyle="#fff";cx.beginPath();cx.arc(r.x,r.y,2.2,0,7);cx.fill();
+    if(r.y<=r.ty||r.vy>-1.2){burst(r.x,r.y,r.c);rockets.splice(i,1)}
+  }
+  for(let i=sparks.length-1;i>=0;i--){
+    const p=sparks[i];p.x+=p.vx;p.y+=p.vy;p.vy+=.045;p.vx*=.985;p.l-=p.d;
+    if(p.l<=0){sparks.splice(i,1);continue}
+    cx.globalAlpha=p.l;cx.fillStyle=p.c;cx.beginPath();cx.arc(p.x,p.y,p.r*p.l+.3,0,7);cx.fill();
+  }
+  cx.globalAlpha=1;
+  requestAnimationFrame(loop);
+}
+loop();
+function finale(){
+  for(let i=0;i<7;i++)setTimeout(()=>launch(W*(.1+Math.random()*.8),H*(.12+Math.random()*.35)),i*220);
+}
+// tap anywhere (but not on inputs/buttons) to fire
+addEventListener("pointerdown",e=>{
+  if(e.target.closest("input,button"))return;
+  launch(e.clientX,e.clientY);
+});
+// fire crackers for 2 seconds on load
+const fireTimer=setInterval(()=>launch(W*(.1+Math.random()*.8),H*(.12+Math.random()*.35)),150);
+setTimeout(()=>clearInterval(fireTimer),2000);
+
+renderAll();
+</script>
+</body>
+</html>
